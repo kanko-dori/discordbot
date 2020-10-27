@@ -1,0 +1,13 @@
+version: '3'
+services:
+  ruby:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    working_dir: /src
+    volumes:
+      - .:/src/c
+    command: /bin/sh -c "while :; do sleep 10; done"
+

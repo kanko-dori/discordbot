@@ -1,8 +1,14 @@
 require 'discordrb'
+require 'erb'
 require_relative './lib/idea_manager.rb'
 
 BOT_TOKEN = ENV['DISCORD_BOT_TOKEN']
 BOT_TOKEN.freeze
+
+db_conf = YAML.load( ERB.new( File.read("./config/database.yml") ).result )
+ActiveRecord::Base.establish_connection(db_conf)
+
+
 bot = Discordrb::Commands::CommandBot.new token: BOT_TOKEN, prefix: '!'
 
 bot.command :user do |event|
@@ -19,23 +25,40 @@ bot.command :add do |event|
   content = event.message.content.gsub(/!add /, '')
 
   puts ":add invoked: #{content}"
-  IdeaManager.addIdea(content)
+  name = IdeaManager.addIdea(content)
+  "#{name} is added!"
 end
 
 bot.command :delete do |event|
   content = event.message.content.gsub(/!delete /, '')
   
   puts ":delete invoked: #{content}"
-  IdeaManager.deleteIdea(content)
+  name = IdeaManager.deleteIdea(content)
+  "#{name} is deleted!"
+
+end
+
+bot.command :last do |event|
+  puts ':list invoked'
+
+  idea = IdeaManager.listLastIdea
+  "id: #{idea['id']}, name: #{idea['name']}"
+end
+
+bot.command :new do |event|
+  puts ':new invoked'
+
+  idea = IdeaManager.listIdea
+  "id: #{idea['id']}, name: #{idea['name']}"
 end
 
 bot.command :list do |event|
   puts ':list invoked'
 
-  ideas = IdeaManager.listIdea
-  ideas.map do |idea|
-    "id: #{idea['id']}, idea: #{idea['idea']}, detail: #{idea['detail']}"
-  end
+  idea = IdeaManager.listIdeasAll
+  idea.map { |i|
+    "id: #{i['id'].to_s}, name: #{i['name']}"
+  }
 end
 
 bot.run

@@ -23,8 +23,15 @@ module IdeaManager
     end
     "#{idea['name']} is added!"
   end
-    
-    idea['name']
+
+  def updateIdea(idea, description, author)
+    idea = Ideas.find_by(name: idea)
+    if idea['author'].eql?(author) then
+      idea.update_column(:description, description)
+      "#{idea['name']} is updated."
+    else
+      "You are not auhor of this idea. Ask #{author} to delete this idea."
+    end
   end
 
   def deleteIdea(idea)

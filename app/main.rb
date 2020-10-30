@@ -27,12 +27,12 @@ bot.command(:add, min_args: 1, max_args: 2, description: 'Add new idea', usage: 
   IdeaManager.addIdea(idea, description, event.user.name)
 end
 
-bot.command :delete do |event|
-  content = event.message.content.gsub(/!delete /, '')
-  
-  puts ":delete invoked: #{content}"
-  name = IdeaManager.deleteIdea(content)
-  "#{name} is deleted!"
+bot.command(:edit, min_args: 2, max_args: 2, description: 'edit existing idea', usage: 'exid [idea] [description]') do |event, idea, description|
+  puts ":edit invoked: #{idea}, #{description}"
+  description = '詳細はまだ書かれていません' unless description
+
+  IdeaManager.updateIdea(idea, description, event.user.name)
+end
 
 end
 

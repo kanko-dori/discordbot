@@ -9,12 +9,20 @@ module IdeaManager
     "Hello, #{name}!"
   end
 
-  def addIdea(idea)
-    idea = Ideas.new{ |i|
-      i.name = idea
-      i.description = ''
-    }
-    idea.save
+  def addIdea(idea, description, author)
+    p idea, description, author
+    begin
+      idea = Ideas.new{ |i|
+        i.name = idea
+        i.description = description
+        i.author = author
+      }
+      idea.save
+    rescue ActiveRecord::RecordNotUnique => exception
+      return "idea #{idea['name']} is already saved. try `:edit` to change description"
+    end
+    "#{idea['name']} is added!"
+  end
     
     idea['name']
   end

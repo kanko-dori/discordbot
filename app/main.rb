@@ -20,12 +20,11 @@ bot.command(:user, descriptipn: 'greet to you!', usage: 'user') do |event|
   IdeaManager.hello(username)
 end
 
-bot.command :add do |event|
-  content = event.message.content.gsub(/!add /, '')
+bot.command(:add, min_args: 1, max_args: 2, description: 'Add new idea', usage: 'add [idea] [description]') do |event, idea, description|
+  puts ":add invoked: #{idea}, #{description}"
+  description = '詳細はまだ書かれていません' unless description
 
-  puts ":add invoked: #{content}"
-  name = IdeaManager.addIdea(content)
-  "#{name} is added!"
+  IdeaManager.addIdea(idea, description, event.user.name)
 end
 
 bot.command :delete do |event|

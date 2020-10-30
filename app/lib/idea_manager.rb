@@ -10,7 +10,6 @@ module IdeaManager
   end
 
   def addIdea(idea, description, author)
-    p idea, description, author
     begin
       idea = Ideas.new{ |i|
         i.name = idea

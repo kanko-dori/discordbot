@@ -4,64 +4,64 @@ require_relative './lib/idea_manager.rb'
 
 BOT_TOKEN = ENV['DISCORD_BOT_TOKEN']
 BOT_TOKEN.freeze
+ENVIRONMENT = ENV['ENV']
+ENVIRONMENT.freeze
 
 db_conf = YAML.load( ERB.new( File.read("./config/database.yml") ).result )
 ActiveRecord::Base.establish_connection(db_conf)
 
+p ENV == 'DEVELOPMENT' ? '/' : '!'
+bot = Discordrb::Commands::CommandBot.new token: BOT_TOKEN, prefix: ENVIRONMENT.eql?('DEVELOPMENT') ? '/' : '!'
 
-bot = Discordrb::Commands::CommandBot.new token: BOT_TOKEN, prefix: '!'
-
-bot.command :user do |event|
-  # Commands send whatever is returned from the block to the channel. This allows for compact commands like this,
-  # but you have to be aware of this so you don't accidentally return something you didn't intend to.
-  # To prevent the return value to be sent to the channel, you can just return `nil`.
+bot.command(:user, descriptipn: 'greet to you!', usage: 'user') do |event|
   username = event.user.name
 
   puts ":user involed: #{username}"
   IdeaManager.hello(username)
 end
 
-bot.command :add do |event|
-  content = event.message.content.gsub(/!add /, '')
+bot.command(:add, min_args: 1, max_args: 2, description: 'Add new idea', usage: 'add [idea] [description]') do |event, idea, description|
+  puts ":add invoked: #{idea}, #{description}"
+  description = '詳細はまだ書かれていません' unless description
 
-  puts ":add invoked: #{content}"
-  name = IdeaManager.addIdea(content)
-  "#{name} is added!"
+  IdeaManager.addIdea(idea, description, event.user.name)
 end
 
-bot.command :delete do |event|
-  content = event.message.content.gsub(/!delete /, '')
-  
-  puts ":delete invoked: #{content}"
-  name = IdeaManager.deleteIdea(content)
-  "#{name} is deleted!"
+bot.command(:edit, min_args: 2, max_args: 2, description: 'edit existing idea', usage: 'exid [idea] [description]') do |event, idea, description|
+  puts ":edit invoked: #{idea}, #{description}"
+  description = '詳細はまだ書かれていません' unless description
 
+  IdeaManager.updateIdea(idea, description, event.user.name)
 end
 
-bot.command :last do |event|
-  puts ':list invoked'
-
-  idea = IdeaManager.listLastIdea
-  "id: #{idea['id']}, name: #{idea['name']}"
+bot.command(:delete, min_args: 1, max_args: 1, description: 'Delete existing idea', usage: 'delete [idea]') do |event, idea|
+  puts ":delete invoked: #{idea} by #{event.user.name}"
+  IdeaManager.deleteIdea(idea, event.user.name)
 end
 
-bot.command :new do |event|
-  puts ':new invoked'
+
+bot.command :latest do |event|
+  puts ':latest invoked'
 
   idea = IdeaManager.listIdea
   event.send_embed { |embed|
-    embed.title = idea['name']
-    # embed.url = "http://example.com/"
-    embed.colour = 0xFF8000
-    # embed.description = "description"
+    embed.title = "最新のアイディア"
+    embed.url = "http://example.com/"
+    embed.color = 0xFF8000
+    embed.description = "description"
     embed.add_field(
-      name: "id",
-      value: idea['id'],
+      name: "name",
+      value: idea['name'],
       inline: true
     )
     embed.add_field(
       name: "description",
       value: idea['description'],
+      inline: true
+    )
+    embed.add_field(
+      name: 'author',
+      value: idea['author'],
       inline: true
     )
   }
@@ -70,9 +70,38 @@ end
 bot.command :list do |event|
   puts ':list invoked'
 
-  idea = IdeaManager.listIdeasAll
-  idea.map { |i|
-    "id: #{i['id'].to_s}, name: #{i['name']}"
+  ideas = IdeaManager.listIdeasAll
+  event.send_embed { |embed|
+    embed.title = "アイディアリスト"
+    # embed.url = "http://example.com/"
+    embed.color = 0xFF8000
+    embed.description = "登録されているアイディア"
+    if ideas.size == 0 then
+      embed.add_field(
+        name: "error",
+        value: '登録されているアイディアはありません',
+        inline: false
+      )
+    else
+      ideas.each { |idea|
+        p idea['description']
+        embed.add_field(
+          name: "name",
+          value: idea['name'],
+          inline: true
+        )
+        embed.add_field(
+          name: "description",
+          value: idea['description'],
+          inline: true
+        )
+        embed.add_field(
+          name: 'author',
+          value: idea['author'],
+          inline: true
+        )
+      }
+    end
   }
 end
 

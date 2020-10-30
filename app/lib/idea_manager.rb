@@ -9,20 +9,40 @@ module IdeaManager
     "Hello, #{name}!"
   end
 
-  def addIdea(idea)
-    idea = Ideas.new{ |i|
-      i.name = idea
-      i.description = ''
-    }
-    idea.save
-    
-    idea['name']
+  def addIdea(idea, description, author)
+    p idea, description, author
+    begin
+      idea = Ideas.new{ |i|
+        i.name = idea
+        i.description = description
+        i.author = author
+      }
+      idea.save
+    rescue ActiveRecord::RecordNotUnique => exception
+      return "idea #{idea['name']} is already saved. try `:edit` to change description"
+    end
+    "#{idea['name']} is added!"
   end
 
-  def deleteIdea(idea)
-    idea = Idea.find_by(name: idea)
-    idea.delete
-    idea
+  def updateIdea(idea, description, author)
+    idea = Ideas.find_by(name: idea)
+    if idea['author'].eql?(author) then
+      idea.update_column(:description, description)
+      "#{idea['name']} is updated."
+    else
+      "You are not auhor of this idea. Ask #{author} to delete this idea."
+    end
+  end
+
+  def deleteIdea(idea, author)
+    idea = Ideas.find_by(name: idea)
+    p idea
+    if idea['author'].eql?(author) then
+      idea.delete
+      "#{idea['name']} is deleted by #{author}"
+    else
+      "You are not auhor of this idea. Ask #{author} to delete this idea."
+    end
   end
 
   def listIdea

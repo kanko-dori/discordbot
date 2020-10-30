@@ -39,30 +39,29 @@ bot.command(:delete, min_args: 1, max_args: 1, description: 'Delete existing ide
   IdeaManager.deleteIdea(idea, event.user.name)
 end
 
-bot.command :last do |event|
-  puts ':list invoked'
 
-  idea = IdeaManager.listLastIdea
-  "id: #{idea['id']}, name: #{idea['name']}"
-end
-
-bot.command :new do |event|
-  puts ':new invoked'
+bot.command :latest do |event|
+  puts ':latest invoked'
 
   idea = IdeaManager.listIdea
   event.send_embed { |embed|
-    embed.title = idea['name']
-    # embed.url = "http://example.com/"
-    embed.colour = 0xFF8000
-    # embed.description = "description"
+    embed.title = "最新のアイディア"
+    embed.url = "http://example.com/"
+    embed.color = 0xFF8000
+    embed.description = "description"
     embed.add_field(
-      name: "id",
-      value: idea['id'],
+      name: "name",
+      value: idea['name'],
       inline: true
     )
     embed.add_field(
       name: "description",
       value: idea['description'],
+      inline: true
+    )
+    embed.add_field(
+      name: 'author',
+      value: idea['author'],
       inline: true
     )
   }
@@ -71,9 +70,38 @@ end
 bot.command :list do |event|
   puts ':list invoked'
 
-  idea = IdeaManager.listIdeasAll
-  idea.map { |i|
-    "id: #{i['id'].to_s}, name: #{i['name']}"
+  ideas = IdeaManager.listIdeasAll
+  event.send_embed { |embed|
+    embed.title = "アイディアリスト"
+    # embed.url = "http://example.com/"
+    embed.color = 0xFF8000
+    embed.description = "登録されているアイディア"
+    if ideas.size == 0 then
+      embed.add_field(
+        name: "error",
+        value: '登録されているアイディアはありません',
+        inline: false
+      )
+    else
+      ideas.each { |idea|
+        p idea['description']
+        embed.add_field(
+          name: "name",
+          value: idea['name'],
+          inline: true
+        )
+        embed.add_field(
+          name: "description",
+          value: idea['description'],
+          inline: true
+        )
+        embed.add_field(
+          name: 'author',
+          value: idea['author'],
+          inline: true
+        )
+      }
+    end
   }
 end
 

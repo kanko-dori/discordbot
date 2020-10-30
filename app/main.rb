@@ -49,7 +49,22 @@ bot.command :new do |event|
   puts ':new invoked'
 
   idea = IdeaManager.listIdea
-  "id: #{idea['id']}, name: #{idea['name']}"
+  event.send_embed { |embed|
+    embed.title = idea['name']
+    # embed.url = "http://example.com/"
+    embed.colour = 0xFF8000
+    # embed.description = "description"
+    embed.add_field(
+      name: "id",
+      value: idea['id'],
+      inline: true
+    )
+    embed.add_field(
+      name: "description",
+      value: idea['description'],
+      inline: true
+    )
+  }
 end
 
 bot.command :list do |event|

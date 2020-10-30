@@ -34,6 +34,9 @@ bot.command(:edit, min_args: 2, max_args: 2, description: 'edit existing idea', 
   IdeaManager.updateIdea(idea, description, event.user.name)
 end
 
+bot.command(:delete, min_args: 1, max_args: 1, description: 'Delete existing idea', usage: 'delete [idea]') do |event, idea|
+  puts ":delete invoked: #{idea} by #{event.user.name}"
+  IdeaManager.deleteIdea(idea, event.user.name)
 end
 
 bot.command :last do |event|

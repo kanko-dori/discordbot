@@ -34,10 +34,15 @@ module IdeaManager
     end
   end
 
-  def deleteIdea(idea)
-    idea = Idea.find_by(name: idea)
-    idea.delete
-    idea
+  def deleteIdea(idea, author)
+    idea = Ideas.find_by(name: idea)
+    p idea
+    if idea['author'].eql?(author) then
+      idea.delete
+      "#{idea['name']} is deleted by #{author}"
+    else
+      "You are not auhor of this idea. Ask #{author} to delete this idea."
+    end
   end
 
   def listIdea

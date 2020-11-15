@@ -34,7 +34,7 @@ bot.on('ready', () => {
 bot.on('message', (msg) => {
   if (!msg.content.startsWith(prefix)) return;
   if (!ghok) return;
-  const cmds = msg.content.substr(prefix.length).split(/\s/);
+  const cmds = msg.content.substr(prefix.length).split(/\s+/);
   const cmd = cmds.shift();
   const opts = cmds.join(' ');
 
@@ -45,17 +45,23 @@ bot.on('message', (msg) => {
         color,
         description: 'usage',
         fields: [
-          { name: `${prefix}add IDEA_TITLE`, value: 'Register an idea to issue' },
+          { name: `${prefix}add IDEA_TITLE [DESCRIPTION]`, value: 'Register an idea to issue' },
           { name: `${prefix}help`, value: 'Display thi help message' },
         ],
         title: 'Idea Manager help',
       })).catch(console.error);
       break;
     case 'add':
+      const [title, ...descriptions] = opts.split(/\s+/);
+      if (title === '') {
+        msg.channel.send(`USAGE: ${prefix}add IDEA_TITLE [DESCRIPTION]`);
+        break;
+      }
       ghok.request('POST /repos/:owner/:repo/issues', {
         owner: repository.owner,
         repo: repository.name,
         title: opts,
+        body: descriptions.join(' '),
       }).then((res) => (200 <= res.status && res.status < 300)
         ? msg.channel.send(`Added to ${res.data.html_url}`)
         : msg.channel.send('Failed')

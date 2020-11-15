@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "node -r dotenv/config dist/index"
+    "start": "node -r dotenv/config dist/index",
+    "pm2:start": "pm2 start npm --name idea-manager -- start"
   },
   "repository": {
     "type": "git",

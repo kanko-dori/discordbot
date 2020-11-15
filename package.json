@@ -1,0 +1,30 @@
+{
+  "name": "idea-manager",
+  "version": "0.1.0",
+  "description": "bot for kanko-dori",
+  "private": "true",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "node -r dotenv/config dist/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kanko-dori/idea-manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kanko-dori/idea-manager/issues"
+  },
+  "homepage": "https://github.com/kanko-dori/idea-manager#readme",
+  "devDependencies": {
+    "typescript": "^4.0.5"
+  },
+  "dependencies": {
+    "@octokit/app": "^10.0.0",
+    "discord.js": "^12.4.1",
+    "dotenv": "^8.2.0"
+  }
+}

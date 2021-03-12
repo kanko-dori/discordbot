@@ -1,2 +1,2 @@
 # discordbot
-this is bot for kanko-dori
+this is bot for kanko-dori, using ruby
